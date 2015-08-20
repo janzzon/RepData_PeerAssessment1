@@ -1,17 +1,13 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Stefan Jansson"
-date: "`r format(Sys.time(), '%Y-%m-%d')`"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Stefan Jansson  
+`r format(Sys.time(), '%Y-%m-%d')`  
 
 This is the Rmd document for Coursera Reproducible Research course, Peer Assignment 1
 
 ## Loading and preprocessing the data
 To ensure the document is reproducable as a stand alone document, required packages are installed and the data is downloaded if missing.
-```{r}
+
+```r
 # Check if required packages are installed and install if needed. Attach dplyr & ggplot2
 if (!"downloader" %in% installed.packages()) install.packages("downloader")
 if (!"dplyr" %in% installed.packages()) install.packages("dplyr")
@@ -36,7 +32,8 @@ activity$date <- activity$date %>% as.Date()
   
 ## What is mean total number of steps taken per day?
 The distibution of measured steps per day is plotted below.  
-```{r}
+
+```r
 sumPerDayDF <-
   activity %>% group_by (date) %>% summarise(sumPerDay = sum(steps, na.rm = T))
 
@@ -44,35 +41,40 @@ hist(
   sumPerDayDF$sumPerDay, breaks = 20, xlab = "Steps per day",
   main = "Steps per day, missing values as in input data"
 )
-````
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
   
-A number of days, `r sum(sumPerDayDF$sumPerDay==0)` have no measurements so the sum for those days is 0 steps.  
-The mean steps per day is `r sumPerDayDF$sumPerDay %>% mean %>% round %>% as.integer` and the median
-is `r sumPerDayDF$sumPerDay %>% median %>% round %>% as.integer` steps per day.
+A number of days, 8 have no measurements so the sum for those days is 0 steps.  
+The mean steps per day is 9354 and the median
+is 10395 steps per day.
 
   
 ## What is the average daily activity pattern?
 The unmodified daily activity pattern is plotted below. Note that there's repeated chunks of missing values (the parts of the plot with straight lines).  
 No compensation is made for the missing data.
-````{r}
+
+```r
 # Create dataframe w. mean steps per interval
 meanPerIntvDF <-
   activity %>% group_by (interval) %>% summarise(meanPerIntv = mean(steps, na.rm = T))
 # Plot daily averages
 ggplot(meanPerIntvDF) + aes(interval, meanPerIntv) + geom_line() + ylab("Steps per interval") +
   ggtitle("Average daily activity pattern")
+```
 
-````
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
   
-Interval number `r meanPerIntvDF %>% filter (meanPerIntv == max(meanPerIntv)) %>% select (interval)` is the most active interval with 
-an average of `r meanPerIntvDF$meanPerIntv %>% max %>% round` steps.
+Interval number 835 is the most active interval with 
+an average of 206 steps.
   
 ## Imputing missing values
-There's missing values in the data, both rows with NA in steps column (`r activity$steps %>% is.na %>% sum` of them) 
+There's missing values in the data, both rows with NA in steps column (2304 of them) 
 and chunks of intervals missing for all days.  
 The chunks of missing values is left unaltered, but the values steps == NA is replaced with mean step values for each missing period.
 
-````{r}
+
+```r
 # Create data frame with no missing values. 
 activity_nomiss <- activity
 # Replace NA with mean for the missing interval
@@ -87,17 +89,20 @@ hist(
   sumPerDayDF_nomiss$sumPerDay, breaks = 20, xlab = "Steps per day",
   main = "Steps per day missing values replaced\nby mean of missing period"
 )
-````
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
   
 When all NA-values is replaced with averages per interval, the mean changes to 
-`r sumPerDayDF_nomiss$sumPerDay %>% mean %>% round %>% as.integer` and the median become
-`r sumPerDayDF_nomiss$sumPerDay %>% median %>% round %>% as.integer` steps.  
-Since the `r sum(sumPerDayDF$sumPerDay==0)` days with 0 steps is replaced with average values, 
+10766 and the median become
+10766 steps.  
+Since the 8 days with 0 steps is replaced with average values, 
 both the mean and median is higher in the new data set.
   
 ## Are there differences in activity patterns between weekdays and weekends?
 NA-values is removed rather than recalculated.  
-````{r}
+
+```r
 # Create factor wday for weekday/weekend
 activity$wday <- factor("weekday", levels = c("weekday","weekend"))
 # Use lubridate::wday to select saturday and sunday. Lubridate is an additional package,
@@ -109,7 +114,8 @@ meanPerIntvDFw <-
 # Plot 2 plots by wday type
 ggplot(meanPerIntvDFw) + aes(interval, meanPerIntv) + geom_line() + ylab("Steps per interval") +
   facet_grid(wday~.) + ggtitle("Number of steps per weekdays and weekend")
+```
 
-````
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
   
 Weekdays have more activity early mornings, and weekends have more activity during mid day.
