@@ -11,12 +11,11 @@ This is the Rmd document for Coursera Reproducible Research course, Peer Assignm
 
 ## Loading and preprocessing the data
 To ensure the document is reproducable as a stand alone document, required packages are installed and the data is downloaded if missing.
-```{r}
+```{r Download and load data}
 # Check if required packages are installed and install if needed. Attach dplyr & ggplot2
 if (!"downloader" %in% installed.packages()) install.packages("downloader")
 if (!"dplyr" %in% installed.packages()) install.packages("dplyr")
 if (!"ggplot2" %in% installed.packages()) install.packages("ggplot2")
-if (!"lubridate" %in% installed.packages()) install.packages("lubridate")
 suppressPackageStartupMessages(library(dplyr))
 library(ggplot2)
 
@@ -36,7 +35,7 @@ activity$date <- activity$date %>% as.Date()
   
 ## What is mean total number of steps taken per day?
 The distibution of measured steps per day is plotted below.  
-```{r}
+```{r Hist steps per day}
 sumPerDayDF <-
   activity %>% group_by (date) %>% summarise(sumPerDay = sum(steps, na.rm = T))
 
@@ -54,7 +53,7 @@ is `r sumPerDayDF$sumPerDay %>% median %>% round %>% as.integer` steps per day.
 ## What is the average daily activity pattern?
 The unmodified daily activity pattern is plotted below. Note that there's repeated chunks of missing values (the parts of the plot with straight lines).  
 No compensation is made for the missing data.
-````{r}
+````{r Daily activity }
 # Create dataframe w. mean steps per interval
 meanPerIntvDF <-
   activity %>% group_by (interval) %>% summarise(meanPerIntv = mean(steps, na.rm = T))
@@ -72,7 +71,7 @@ There's missing values in the data, both rows with NA in steps column (`r activi
 and chunks of intervals missing for all days.  
 The chunks of missing values is left unaltered, but the values steps == NA is replaced with mean step values for each missing period.
 
-````{r}
+````{r Missing values}
 # Create data frame with no missing values. 
 activity_nomiss <- activity
 # Replace NA with mean for the missing interval
@@ -97,12 +96,11 @@ both the mean and median is higher in the new data set.
   
 ## Are there differences in activity patterns between weekdays and weekends?
 NA-values is removed rather than recalculated.  
-````{r}
-# Create factor wday for weekday/weekend
+````{r Weekday or Weekend}
+# Create factor wday for weekday/weekend and assign it with weekday
 activity$wday <- factor("weekday", levels = c("weekday","weekend"))
-# Use lubridate::wday to select saturday and sunday. Lubridate is an additional package,
-# but the base::weekdays() makes the code dependent of the users locale LC_TIME
-activity$wday[lubridate::wday(activity$date) %in% c(1,7)] <- "weekend"
+# Assign weekend to all saturdays and sundays
+activity$wday[strftime(activity$date, format = "%w") %in% c(6,0)] <- "weekend"
 # Create summary of averages per interval and weekday/weekend. Skip NA-values
 meanPerIntvDFw <- 
   activity %>% na.omit %>% group_by (interval, wday) %>% summarise(meanPerIntv = mean(steps, na.rm = T))

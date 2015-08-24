@@ -12,7 +12,6 @@ To ensure the document is reproducable as a stand alone document, required packa
 if (!"downloader" %in% installed.packages()) install.packages("downloader")
 if (!"dplyr" %in% installed.packages()) install.packages("dplyr")
 if (!"ggplot2" %in% installed.packages()) install.packages("ggplot2")
-if (!"lubridate" %in% installed.packages()) install.packages("lubridate")
 suppressPackageStartupMessages(library(dplyr))
 library(ggplot2)
 
@@ -43,7 +42,7 @@ hist(
 )
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+![](PA1_template_files/figure-html/Hist steps per day-1.png) 
   
 A number of days, 8 have no measurements so the sum for those days is 0 steps.  
 The mean steps per day is 9354 and the median
@@ -63,7 +62,7 @@ ggplot(meanPerIntvDF) + aes(interval, meanPerIntv) + geom_line() + ylab("Steps p
   ggtitle("Average daily activity pattern")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+![](PA1_template_files/figure-html/Daily activity-1.png) 
   
 Interval number 835 is the most active interval with 
 an average of 206 steps.
@@ -91,7 +90,7 @@ hist(
 )
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![](PA1_template_files/figure-html/Missing values-1.png) 
   
 When all NA-values is replaced with averages per interval, the mean changes to 
 10766 and the median become
@@ -103,11 +102,10 @@ both the mean and median is higher in the new data set.
 NA-values is removed rather than recalculated.  
 
 ```r
-# Create factor wday for weekday/weekend
+# Create factor wday for weekday/weekend and assign it with weekday
 activity$wday <- factor("weekday", levels = c("weekday","weekend"))
-# Use lubridate::wday to select saturday and sunday. Lubridate is an additional package,
-# but the base::weekdays() makes the code dependent of the users locale LC_TIME
-activity$wday[lubridate::wday(activity$date) %in% c(1,7)] <- "weekend"
+# Assign weekend to all saturdays and sundays
+activity$wday[strftime(activity$date, format = "%w") %in% c(6,0)] <- "weekend"
 # Create summary of averages per interval and weekday/weekend. Skip NA-values
 meanPerIntvDFw <- 
   activity %>% na.omit %>% group_by (interval, wday) %>% summarise(meanPerIntv = mean(steps, na.rm = T))
@@ -116,6 +114,6 @@ ggplot(meanPerIntvDFw) + aes(interval, meanPerIntv) + geom_line() + ylab("Steps 
   facet_grid(wday~.) + ggtitle("Number of steps per weekdays and weekend")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![](PA1_template_files/figure-html/Weekday or Weekend-1.png) 
   
 Weekdays have more activity early mornings, and weekends have more activity during mid day.
