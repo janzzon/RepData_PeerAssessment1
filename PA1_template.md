@@ -1,6 +1,11 @@
-# Reproducible Research: Peer Assessment 1
-Stefan Jansson  
-`r format(Sys.time(), '%Y-%m-%d')`  
+---
+title: "Reproducible Research: Peer Assessment 1"
+author: "Stefan Jansson"
+date: "2015-08-25"
+output: 
+  html_document:
+    keep_md: true
+---
 
 This is the Rmd document for Coursera Reproducible Research course, Peer Assignment 1
 
@@ -42,7 +47,7 @@ hist(
 )
 ```
 
-![](PA1_template_files/figure-html/Hist steps per day-1.png) 
+![plot of chunk Hist steps per day](figure/Hist steps per day-1.png) 
   
 A number of days, 8 have no measurements so the sum for those days is 0 steps.  
 The mean steps per day is 9354 and the median
@@ -62,7 +67,7 @@ ggplot(meanPerIntvDF) + aes(interval, meanPerIntv) + geom_line() + ylab("Steps p
   ggtitle("Average daily activity pattern")
 ```
 
-![](PA1_template_files/figure-html/Daily activity-1.png) 
+![plot of chunk Daily activity](figure/Daily activity-1.png) 
   
 Interval number 835 is the most active interval with 
 an average of 206 steps.
@@ -90,7 +95,7 @@ hist(
 )
 ```
 
-![](PA1_template_files/figure-html/Missing values-1.png) 
+![plot of chunk Missing values](figure/Missing values-1.png) 
   
 When all NA-values is replaced with averages per interval, the mean changes to 
 10766 and the median become
@@ -114,6 +119,6 @@ ggplot(meanPerIntvDFw) + aes(interval, meanPerIntv) + geom_line() + ylab("Steps 
   facet_grid(wday~.) + ggtitle("Number of steps per weekdays and weekend")
 ```
 
-![](PA1_template_files/figure-html/Weekday or Weekend-1.png) 
+![plot of chunk Weekday or Weekend](figure/Weekday or Weekend-1.png) 
   
 Weekdays have more activity early mornings, and weekends have more activity during mid day.
